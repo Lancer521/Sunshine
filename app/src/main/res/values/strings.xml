@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Sunshine</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="OPEN_WEATHER_MAP_API_KEY">c2c3aecddb1e2520c223304316bc232b</string>
+</resources>
