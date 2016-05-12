@@ -10,7 +10,8 @@
   <string name="pref_location_default">84321</string>
   <string name="pref_units_key">Units</string>
   <string name="pref_units_label">Temperature Units</string>
-  <string name="pref_units_default">Metric</string>
+  <string name="pref_units_metric">Metric</string>
+  <string name="pref_units_imperial">Imperial</string>
   <string name="action_map">View Map</string>
   <string name="action_share">Share</string>
 </resources>

@@ -120,7 +120,7 @@ public class ForecastFragment extends Fragment {
       String format = "json";
       String units;
       if(prefs.contains(getString(R.string.pref_units_key))) {
-        units = prefs.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default));
+        units = prefs.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_metric));
       } else {
         units = "metric";
       }
