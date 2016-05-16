@@ -24,15 +24,20 @@ public class ForecastAdapter extends CursorAdapter {
   private final int VIEW_TYPE_TODAY = 0;
   private final int VIEW_TYPE_FUTURE_DAY = 1;
   private final int VIEW_TYPE_COUNT = 2;
+  private boolean mUseTodayLayout;
 
   @Override
   public int getItemViewType(int position) {
-    return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+    return (position == 0 && mUseTodayLayout) ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
   }
 
   @Override
   public int getViewTypeCount() {
     return VIEW_TYPE_COUNT;
+  }
+
+  public void setUseTodayLayout(boolean useTodayLayout){
+    mUseTodayLayout = useTodayLayout;
   }
 
   /*
@@ -81,10 +86,10 @@ public class ForecastAdapter extends CursorAdapter {
 
     // Read high temperature from cursor
     double high = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
-    viewHolder.highView.setText(Utility.formatTemperature(mContext, high, isMetric));
+    viewHolder.highView.setText(Utility.formatTemperature(mContext, high));
 
     double low = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
-    viewHolder.lowView.setText(Utility.formatTemperature(mContext, low, isMetric));
+    viewHolder.lowView.setText(Utility.formatTemperature(mContext, low));
   }
 
   public static class ViewHolder{

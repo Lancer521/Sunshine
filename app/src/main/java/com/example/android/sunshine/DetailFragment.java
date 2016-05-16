@@ -2,6 +2,7 @@ package com.example.android.sunshine;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -28,11 +29,13 @@ import com.example.android.sunshine.data.WeatherContract.WeatherEntry;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
   private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+  static final String DETAIL_URI = "URI";
 
   private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
 
   private ShareActionProvider mShareActionProvider;
   private String mForecastStr;
+  private Uri mUri;
 
   private static final int DETAIL_LOADER = 0;
 
@@ -78,6 +81,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
+
+    Bundle args = getArguments();
+    if(args != null)
+      mUri = args.getParcelable(DetailFragment.DETAIL_URI);
+
     View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
     mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
     mFriendlyDateView = (TextView) rootView.findViewById(R.id.detail_day_textview);
@@ -85,9 +93,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     mDescriptionView = (TextView) rootView.findViewById(R.id.detail_forecast_textview);
     mHighTempView = (TextView) rootView.findViewById(R.id.detail_high_textview);
     mLowTempView = (TextView) rootView.findViewById(R.id.detail_low_textview);
-    mHumidityView = (TextView) rootView.findViewById(R.id.detail_humidity);
-    mWindView = (TextView) rootView.findViewById(R.id.detail_wind);
-    mPressureView = (TextView) rootView.findViewById(R.id.detail_pressure);
+    mHumidityView = (TextView) rootView.findViewById(R.id.detail_humidity_textview);
+    mWindView = (TextView) rootView.findViewById(R.id.detail_wind_textview);
+    mPressureView = (TextView) rootView.findViewById(R.id.detail_pressure_textview);
     return rootView;
   }
 
@@ -118,19 +126,26 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     super.onActivityCreated(savedInstanceState);
   }
 
+  void onLocationChanged(String newLocation){
+    if(mUri != null){
+      long date = WeatherContract.WeatherEntry.getDateFromUri(mUri);
+      mUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+      getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+    }
+  }
+
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-    Intent intent = getActivity().getIntent();
-    if (intent == null || intent.getData() == null) {
-      return null;
+    if (mUri != null){
+      return new CursorLoader(
+                                 getActivity(),
+                                 mUri,
+                                 DETAIL_COLUMNS,
+                                 null,
+                                 null,
+                                 null);
     }
-    return new CursorLoader(
-                               getActivity(),
-                               intent.getData(),
-                               DETAIL_COLUMNS,
-                               null,
-                               null,
-                               null);
+    return null;
   }
 
   @Override
@@ -150,10 +165,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
       boolean isMetric = Utility.isMetric(getActivity());
 
-      String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
+      String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP));
       mHighTempView.setText(high);
 
-      String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+      String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP));
       mLowTempView.setText(low);
 
       float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
